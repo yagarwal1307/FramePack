@@ -319,7 +319,7 @@ def process(input_image, prompt, n_prompt, seed, total_second_length, latent_win
     global stream
     assert input_image is not None, 'No input image!'
 
-    yield None, None, '', '', gr.update(interactive=False), gr.update(interactive=True)
+    yield None, None, '', '', gr.update(interactive=False), gr.update(interactive=True), None
 
     stream = AsyncStream()
 
@@ -332,14 +332,14 @@ def process(input_image, prompt, n_prompt, seed, total_second_length, latent_win
 
         if flag == 'file':
             output_filename = data
-            yield output_filename, gr.update(), gr.update(), gr.update(), gr.update(interactive=False), gr.update(interactive=True)
+            yield output_filename, gr.update(), gr.update(), gr.update(), gr.update(interactive=False), gr.update(interactive=True), output_filename
 
         if flag == 'progress':
             preview, desc, html = data
-            yield gr.update(), gr.update(visible=True, value=preview), desc, html, gr.update(interactive=False), gr.update(interactive=True)
+            yield gr.update(), gr.update(visible=True, value=preview), desc, html, gr.update(interactive=False), gr.update(interactive=True), gr.update()
 
         if flag == 'end':
-            yield output_filename, gr.update(visible=False), gr.update(), '', gr.update(interactive=True), gr.update(interactive=False)
+            yield output_filename, gr.update(visible=False), gr.update(), '', gr.update(interactive=True), gr.update(interactive=False), output_filename
             break
 
 
@@ -393,11 +393,12 @@ with block:
             gr.Markdown('Note that the ending actions will be generated before the starting actions due to the inverted sampling. If the starting action is not in the video, you just need to wait, and it will be generated later.')
             progress_desc = gr.Markdown('', elem_classes='no-generating-animation')
             progress_bar = gr.HTML('', elem_classes='no-generating-animation')
+            output_file = gr.File(label="Download Video")
 
     gr.HTML('<div style="text-align:center; margin-top:20px;">Share your results and find ideas at the <a href="https://x.com/search?q=framepack&f=live" target="_blank">FramePack Twitter (X) thread</a></div>')
 
     ips = [input_image, prompt, n_prompt, seed, total_second_length, latent_window_size, steps, cfg, gs, rs, gpu_memory_preservation, use_teacache, mp4_crf]
-    start_button.click(fn=process, inputs=ips, outputs=[result_video, preview_image, progress_desc, progress_bar, start_button, end_button])
+    start_button.click(fn=process, inputs=ips, outputs=[result_video, preview_image, progress_desc, progress_bar, start_button, end_button, output_file])
     end_button.click(fn=end_process)
 
 
